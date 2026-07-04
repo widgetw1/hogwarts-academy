@@ -1,42 +1,16 @@
 <?php
-/**
- * koneksi.php
- * Koneksi database — LOCALHOST ONLY (XAMPP/Laragon/dsb).
- * Sesuaikan nilai di bawah jika konfigurasi MySQL localhost Anda berbeda.
- */
+// Ambil variabel dari sistem Clever Cloud
+$host = getenv('MYSQL_ADDON_HOST');
+$user = getenv('MYSQL_ADDON_USER');
+$pass = getenv('MYSQL_ADDON_PASSWORD');
+$db   = getenv('MYSQL_ADDON_DB');
+$port = getenv('MYSQL_ADDON_PORT') ?;// Jika kosong, gunakan port default 3306
 
-$servername = getenv('MYSQL_ADDON_HOST');
-$username   = getenv('MYSQL_ADDON_USER');
-$password   = getenv('MYSQL_ADDON_PASSWORD');
-$dbname     = getenv('MYSQL_ADDON_DB');
+// Menggunakan socket jika host tidak terdeteksi, tapi ini jarang terjadi di cloud
+$conn = new mysqli($host, $user, $pass, $db, $port);
 
-// Aktifkan error reporting mysqli sebagai exception agar mudah di-debug
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-try {
-    $koneksi = new mysqli($host, $user, $pass, $db, (int)$port);
-    $koneksi->set_charset('utf8mb4');
-} catch (mysqli_sql_exception $e) {
-    http_response_code(500);
-    die(json_encode([
-        'success' => false,
-        'message' => 'Koneksi database gagal: ' . $e->getMessage()
-    ]));
+if ($conn->connect_error) {
+    // Eror ini yang muncul di websitemu, kita ubah jadi lebih spesifik
+    die("Koneksi gagal: " . $conn->connect_error);
 }
-
-/**
- * Struktur tabel yang dibutuhkan (jalankan sekali di phpMyAdmin / MySQL client):
- *
- * CREATE TABLE IF NOT EXISTS pendaftaran_gen_1 (
- *   no INT AUTO_INCREMENT PRIMARY KEY,
- *   nama_depan VARCHAR(100) NOT NULL,
- *   nama_belakang VARCHAR(100) NOT NULL,
- *   idha VARCHAR(20) NOT NULL,
- *   tanggal_lahir DATE NOT NULL,
- *   alamat VARCHAR(255) NOT NULL,
- *   jenis_kelamin VARCHAR(20) NOT NULL,
- *   status_darah VARCHAR(20) NOT NULL,
- *   generasi INT NOT NULL,
- *   tanggal_daftar TIMESTAMP DEFAULT CURRENT_TIMESTAMP
- * ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
- */
+?>
