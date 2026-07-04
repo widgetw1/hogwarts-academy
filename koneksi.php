@@ -5,11 +5,10 @@
  * Sesuaikan nilai di bawah jika konfigurasi MySQL localhost Anda berbeda.
  */
 
-$host = 'localhost';
-$db   = 'hogwarts';
-$user = 'root';
-$pass = '';
-$port = '3306';
+$servername = getenv('MYSQL_ADDON_HOST');
+$username   = getenv('MYSQL_ADDON_USER');
+$password   = getenv('MYSQL_ADDON_PASSWORD');
+$dbname     = getenv('MYSQL_ADDON_DB');
 
 // Aktifkan error reporting mysqli sebagai exception agar mudah di-debug
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
